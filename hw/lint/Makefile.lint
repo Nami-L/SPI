@@ -1,0 +1,180 @@
+##=============================================================================
+## [Filename]       Makefile.lint
+## [Project]        lint_fmt_utils
+## [Author]         Ciro Bermudez - cirofabian.bermudezmarquez@ba.infn.it
+## [Language]       GNU Makefile
+## [Created]        Dec 2024
+## [Modified]       -
+## [Description]    Makefile to lint and format the RTL and TB code
+## [Notes]          It automatically creates a backup of the code
+## [Status]         stable
+## [Revisions]      -
+##=============================================================================
+
+# ===============================  VARIABLES  =================================
+
+# Miscellaneous variables
+CUR_DATE   := $(shell date +%Y-%m-%d_%H-%M-%S)
+SHELL_TYPE := $(shell echo $$SHELL)
+
+# Directories
+GIT_DIR  := $(shell git rev-parse --show-toplevel)
+ROOT_DIR := $(CURDIR)
+RTL_DIR  := $(ROOT_DIR)/../rtl
+TB_DIR   := $(ROOT_DIR)/../tb 
+FMT_DIR  := $(ROOT_DIR)/fmt_log
+
+# Files
+RTL_FILES := $(shell find $(RTL_DIR) -name "*.sv" -or -name "*.v")
+TB_FILES  := $(shell find $(TB_DIR) -name "*.sv" -or -name "*.v")
+
+# Colors
+C_RED := \033[31m
+C_GRE := \033[32m
+C_BLU := \033[34m
+C_YEL := \033[33m
+C_ORA := \033[38;5;214m
+NC    := \033[0m 
+
+# Verible Flags
+LINT_FLAGS := --rules_config $(ROOT_DIR)/.rules.verible_lint
+FMT_FLAGS  := --flagfile=$(ROOT_DIR)/.rules.verible_format
+MODE       ?= check
+
+# ================================  TARGETS  ==================================
+SHELL         := bash
+.DEFAULT_GOAL := all
+
+.PHONY: all
+all: help
+#______________________________________________________________________________
+
+check-shell:
+	@echo -e "[INFO]: You are running a $(SHELL_TYPE) shell\n"
+#______________________________________________________________________________
+
+.PHONY: install-verible
+install-verible: ## Install Verible
+	@./scripts/install_verible.sh
+#______________________________________________________________________________
+
+.PHONY: install-verilator
+install-verilator: ## Install Verilator
+	@./scripts/install_verilator.sh
+#______________________________________________________________________________
+
+.PHONY: list
+list: ## List all the RTL and TB files
+	@echo -e "$(C_ORA)List of RTL and TB files...$(NC)"
+	@echo -e "$(C_YEL)RTL files:$(NC)"
+	@for file in $(RTL_FILES); do \
+		echo " - $$file"; \
+	done
+	@echo -e "$(C_YEL)Testbench files:$(NC)"
+	@for file in $(TB_FILES); do \
+		echo " - $$file"; \
+	done
+	@echo -e "$(C_YEL)Checking fmt_log/ directory$(NC)"
+	@if [ -d "$(FMT_DIR)" ]; then \
+		echo " - fmt_log/ directory exists"; \
+	else \
+		echo " - fmt_log/ directory does not exists"; \
+		echo " - fmt_log/ created"; \
+		mkdir -p $(FMT_DIR); \
+	fi
+#______________________________________________________________________________
+
+.PHONY: lint
+lint: ## Lint the RTL and TB files (Verible)
+	@echo -e "$(C_ORA)Running Verible linting tool...$(NC)"
+	@verible-verilog-lint $(LINT_FLAGS) $(RTL_FILES) $(TB_FILES) || true
+#______________________________________________________________________________
+
+.PHONY: lint-verilator
+lint-verilator: ## Lint the RTL files (Verilator)
+	@echo -e "$(C_ORA)Running Verilator linting tool...$(NC)"
+	@verilator --lint-only -Wall -sv $(RTL_FILES) || true
+#______________________________________________________________________________
+
+.PHONY: format-rtl
+format-rtl: list ## Format RTL code [MODE: inplace|check]
+	@echo -e "$(C_ORA)Running Verible formatting tool for RTL [$(MODE) mode]$(NC)"
+	@if [ "$(MODE)" = "check" ]; then \
+		mkdir -p $(FMT_DIR)/rtl_check_$(CUR_DATE); \
+		for dir in $(RTL_DIR); do \
+			cp -r $$dir $(FMT_DIR)/rtl_check_$(CUR_DATE); \
+		done; \
+		files=$$(find $(FMT_DIR)/rtl_check_$(CUR_DATE) -name "*.sv" -or -name "*.v"); \
+	elif [ "$(MODE)" = "inplace" ]; then \
+		mkdir -p $(FMT_DIR)/rtl_backup_$(CUR_DATE); \
+		for dir in $(RTL_DIR); do \
+			cp -r $$dir $(FMT_DIR)/rtl_backup_$(CUR_DATE); \
+		done; \
+		files="$(RTL_FILES)"; \
+	else \
+		echo "Error: Invalid mode. Use MODE=inplace or MODE=check."; \
+		exit 1; \
+	fi; \
+	for file in $$files; do \
+		echo " - Formatting $$file"; \
+		verible-verilog-format $(FMT_FLAGS) $$file; \
+	done
+#______________________________________________________________________________
+
+.PHONY: format-tb
+format-tb: list ## Format TB code [MODE: inplace|check]
+	@echo -e "$(C_ORA)Running Verible formatting tool for TB [$(MODE) mode]$(NC)"
+	@if [ "$(MODE)" = "check" ]; then \
+		mkdir -p $(FMT_DIR)/tb_check_$(CUR_DATE); \
+		for dir in $(TB_DIR); do \
+			cp -r $$dir $(FMT_DIR)/tb_check_$(CUR_DATE); \
+		done; \
+		files=$$(find $(FMT_DIR)/tb_check_$(CUR_DATE) -name "*.sv" -or -name "*.v"); \
+	elif [ "$(MODE)" = "inplace" ]; then \
+		mkdir -p $(FMT_DIR)/tb_backup_$(CUR_DATE); \
+		for dir in $(TB_DIR); do \
+			cp -r $$dir $(FMT_DIR)/tb_backup_$(CUR_DATE); \
+		done; \
+		files="$(TB_FILES)"; \
+	else \
+		echo "Error: Invalid mode. Use MODE=inplace or MODE=check."; \
+		exit 1; \
+	fi; \
+	for file in $$files; do \
+		echo " - Formatting $$file"; \
+		verible-verilog-format $(FMT_FLAGS) $$file; \
+	done
+#______________________________________________________________________________
+	
+.PHONY: format
+format: format-rtl format-tb ## Format RTL and TB files
+#______________________________________________________________________________
+
+.PHONY: clean
+clean: ## Remove installation files
+	rm -rf $(ROOT_DIR)/scripts/verible $(ROOT_DIR)/scripts/verilator
+#______________________________________________________________________________
+
+.PHONY: help
+help: ## Display help message
+	@echo ""
+	@echo -e "$(C_ORA)Help message...$(NC)"
+	@echo "======================================================================"
+	@echo "Usage: make <target> [mode=check|inplace]"
+	@echo ""
+	@echo "Available variables:"
+	@echo ""
+	@echo "    MODE=$(MODE)"
+	@echo ""
+	@echo "Available targets:"
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "- make \033[36m%-18s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@echo "Examples:"
+	@echo ""
+	@echo "    make list"
+	@echo "    make lint"
+	@echo "    make format"
+	@echo ""
+	@echo "======================================================================"
+	@echo ""

@@ -1,0 +1,32 @@
+Time resolution is 1 ps
+Inicio.
+[READ]                    0: dato = 00010100
+i           0, bit[          0] = 0
+i           1, bit[          1] = 0
+i           2, bit[          2] = 1
+i           3, bit[          3] = 0
+i           4, bit[          4] = 1
+i           5, bit[          5] = 0
+i           6, bit[          6] = 0
+i           7, bit[          7] = 0
+Inicio.
+[READ]                    0: dato = 00010100
+i           0, bit[          0] = 0
+i           1, bit[          1] = 0
+i           2, bit[          2] = 1
+i           3, bit[          3] = 0
+i           4, bit[          4] = 1
+i           5, bit[          5] = 0
+i           6, bit[          6] = 0
+i           7, bit[          7] = 0
+[PULSE]              3370000: posedge db_tick_o, num_pulse    1
+[PULSE]              8410000: posedge db_tick_o, num_pulse    2
+[WRITE]             10210000: iter =   1, din_r[          1] =        247
+[PULSE]             13450000: posedge db_tick_o, num_pulse    3
+[WRITE]             15250000: iter =   2, din_r[          2] =        188
+[PULSE]             18490000: posedge db_tick_o, num_pulse    4
+[WRITE]             20290000: iter =   3, din_r[          3] =        138
+[PULSE]             23530000: posedge db_tick_o, num_pulse    5
+[WRITE]             25330000: iter =   4, din_r[          4] =         15
+[PULSE]             28570000: posedge db_tick_o, num_pulse    6
+$finish called at time : 30370 ns : File "/home/nami/Documents/Proyecto_HDL_Synth/hw/tb/test.sv" Line 16

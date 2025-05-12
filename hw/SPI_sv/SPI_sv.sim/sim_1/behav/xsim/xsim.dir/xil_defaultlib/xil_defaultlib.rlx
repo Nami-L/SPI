@@ -1,0 +1,9 @@
+0.7
+2020.2
+Nov  8 2024
+22:36:55
+/home/nami/Documents/Proyecto_HDL_Synth/hw/SPI_sv/SPI_sv.sim/sim_1/behav/xsim/glbl.v,1724786425,verilog,,,,glbl,,uvm,,,,,,
+/home/nami/Documents/Proyecto_HDL_Synth/hw/rtl/SPI.sv,1746135299,systemVerilog,,/home/nami/Documents/Proyecto_HDL_Synth/hw/tb/SPI_if.sv,,SPI,,uvm,,,,,,
+/home/nami/Documents/Proyecto_HDL_Synth/hw/tb/SPI_if.sv,1746135299,systemVerilog,,/home/nami/Documents/Proyecto_HDL_Synth/hw/tb/test.sv,,SPI_if,,uvm,,,,,,
+/home/nami/Documents/Proyecto_HDL_Synth/hw/tb/tb.sv,1746135299,systemVerilog,,,,tb,,uvm,,,,,,
+/home/nami/Documents/Proyecto_HDL_Synth/hw/tb/test.sv,1746896914,systemVerilog,,/home/nami/Documents/Proyecto_HDL_Synth/hw/tb/tb.sv,,test,,uvm,,,,,,

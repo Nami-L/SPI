@@ -1,0 +1,12 @@
+disable-statement
+-explicit-begin
+-forbidden-macro
+line-length=length:250
+mismatched-labels
+one-module-per-file
+parameter-name-style=localparam_style:CamelCase|ALL_CAPS;parameter_style:CamelCase|ALL_CAPS
+-port-name-suffix
+proper-parameter-declaration
+signal-name-style
+suspicious-semicolon
+uvm-macro-semicolon
