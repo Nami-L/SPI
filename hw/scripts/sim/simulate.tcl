@@ -77,7 +77,8 @@ proc simulate { {mode "batch"} } {
 
   puts "\[INFO\]:"
   puts "        ====== Simulating the design ======"
-
+  set seed [clock clicks -microseconds]
+  puts "Using random seed:10"
   if { ${mode} == "gui" } {
     puts "\[INFO\]: Running simulation in GUI mode"
 
@@ -86,6 +87,7 @@ proc simulate { {mode "batch"} } {
     -wdb [pwd]/wdb/${xelabTop}.wdb \
     -tclbatch [pwd]/../../scripts/sim/run.tcl \
     -stats -onerror stop \
+    -sv_seed $seed \
     -log ${logFile} &
 
   } elseif { ${mode} == "tcl" } {
@@ -104,6 +106,7 @@ proc simulate { {mode "batch"} } {
     -wdb [pwd]/wdb/${xelabTop}.wdb \
     -tclbatch [pwd]/../../scripts/sim/run.tcl \
     -stats -onerror stop -onfinish quit \
+    -sv_seed $seed \
     -log ${logFile} >@stdout 2>@stdout
 
   } else {
